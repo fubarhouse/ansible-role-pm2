@@ -1,0 +1,21 @@
+---
+
+dependencies:
+  - { role: fubarhouse.npm }
+
+galaxy_info:
+  author: fubarhouse
+  description: Provisions Node applications via PM2
+  license: "license (BSD, MIT)"
+  min_ansible_version: 2.0.2
+  platforms:
+  - name: Ubuntu
+    versions:
+    - all
+  - name:
+    - Debian
+    versions:
+    - all
+  categories:
+    - system
+    - development

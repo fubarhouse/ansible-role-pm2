@@ -1,0 +1,5 @@
+---
+# file: roles/fubarhouse.pm2/tasks/main.yml
+
+- name: "Importing PM2 Tasks"
+  include: pm2.yml
