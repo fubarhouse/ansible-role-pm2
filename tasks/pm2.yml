@@ -98,8 +98,8 @@
 
 - name: "PM2 | Importing tasks for Apache"
   include: "vhost-apache.yml"
-  when: drupalvm_webserver == 'apache'
+  when: apache2_isinstalled is defined
 
 - name: "PM2 | Importing tasks for Nginx"
   include: "vhost-nginx.yml"
-  when: drupalvm_webserver == 'nginx'
+  when: nginx_isinstalled is defined

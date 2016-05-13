@@ -10,7 +10,7 @@
     group: root
     mode: 0777
   with_items: "{{ fubarhouse_pm2.node_apps }}"
-  when: drupalvm_webserver == 'apache'
+  when: apache2_isinstalled is defined
 
 - name: "PM2 | Make vhost enabled"
   become: yes
@@ -22,4 +22,4 @@
     group: root
     mode: 0777
   with_items: "{{ fubarhouse_pm2.node_apps }}"
-  when: drupalvm_webserver == 'apache'
+  when: apache2_isinstalled is defined

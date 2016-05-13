@@ -1,5 +1,15 @@
 ---
 # file: roles/fubarhouse.pm2/tasks/main.yml
 
+- name: "Scanning for Apache2"
+  stat:
+    path: /usr/sbin/apache2
+  register: apache2_isinstalled
+
+- name: "Scanning for Nginx"
+  stat:
+    path: /usr/sbin/nginx
+  register: nginx_isinstalled
+
 - name: "Importing PM2 Tasks"
   include: pm2.yml
