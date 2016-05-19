@@ -81,6 +81,11 @@
   with_items: "{{ fubarhouse_pm2.node_apps }}"
   ignore_errors: yes
 
+- name: "PM2 | Flush logs"
+  become: yes
+  become_user: "{{ ansible_ssh_user }}"
+  raw: "{{ fubarhouse_pm2.pm2_exec }} flush"
+
 - name: "PM2 | Waiting for applications to load"
   wait_for:
     port: "{{ item.port }}"
