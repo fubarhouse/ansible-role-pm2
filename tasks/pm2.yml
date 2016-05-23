@@ -101,6 +101,13 @@
   delay: 5
   ignore_errors: yes
 
+- name: "PM2 | Reloading applications"
+  become: yes
+  become_user: "{{ ansible_ssh_user }}"
+  raw: "{{ fubarhouse_pm2.pm2_exec }} reload '{{ item.name }}'"
+  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  ignore_errors: yes
+
 - name: "PM2 | Importing tasks for Apache"
   include: "vhost-apache.yml"
   when: apache2_isinstalled is defined
