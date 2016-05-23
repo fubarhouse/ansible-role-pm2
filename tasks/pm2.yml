@@ -50,7 +50,8 @@
 - name: PM2 | Copying configuration file when asked
   become: yes
   become_user: root
-  file:
+  copy:
+    remote_src: yes
     src: "{{ item.location }}/{{ item.config.origin }}"
     dest: "{{ item.location }}/{{ item.config.destination }}"
     owner: "{{ ansible_ssh_user }}"
