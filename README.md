@@ -25,12 +25,14 @@
   pm2_exec: "/usr/local/bin/pm2"
   node_apps:
     - name: myApp
-      database: myapp
       port: 3000
       location: /opt/myapp
       start: app.js
       init: reset.js
       repository: ssh://git@bitbucket.org/mybitbucket/myapp.git
+      database:
+        name: myapp
+        file: database.sql
       config:
         origin: config/local-example.js
         destination: config/local.js
@@ -51,6 +53,8 @@
 ## Installation
 
   * Add a copy of the defaults/main.yml into a new variables file included in the playbook, and plug in the details as required.
+
+  * If specifying a database file, note that only mysql is currently supported. The task is fed via the mysql module in Ansible.
 
 ## License
 

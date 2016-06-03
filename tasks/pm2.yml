@@ -61,12 +61,20 @@
 
 - name: PM2 | Create databases when requested
   mysql_db:
-    name: "{{ item.database }}"
+    name: "{{ item.database.name }}"
     collation: "utf8_general_ci"
     encoding: "utf8"
     state: present
   with_items: "{{ fubarhouse_pm2.node_apps }}"
-  when: item.database is defined
+  when: item.database.name is defined
+
+- name: PM2 | Import database if provided
+  mysql_db:
+    state: import
+    name: "{{ item.database.name }}"
+    target: "{{ item.location }}/{{ item.database.file }}"
+  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  when: item.database.file is defined
 
 - name: PM2 | Run initialization scripts"
   become: yes
