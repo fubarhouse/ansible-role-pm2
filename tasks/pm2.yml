@@ -16,7 +16,7 @@
   become: yes
   become_user: "root"
   file:
-    src: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
+    src: "/usr/local/lib/node_modules/pm2/bin/pm2"
     dest: "{{ fubarhouse_pm2.pm2_exec }}"
     owner: "{{ fubarhouse_user }}"
     mode: 0755
