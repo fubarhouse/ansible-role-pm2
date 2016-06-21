@@ -9,7 +9,7 @@
     owner: root
     group: root
     mode: 0777
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   when: apache2_isinstalled is defined
 
 - name: "PM2 | Make vhost enabled"
@@ -21,5 +21,5 @@
     owner: root
     group: root
     mode: 0777
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   when: apache2_isinstalled is defined

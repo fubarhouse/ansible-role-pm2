@@ -2,20 +2,25 @@
 
 # file: roles/fubarhouse.pm2/tasks/pm2.yml
 
-- name: "PM2 | Checking"
-  become: yes
-  become_user: "{{ ansible_ssh_user }}"
-  stat:
-    path: "{{ fubarhouse_pm2.pm2_exec }}"
-  register: pm2_install_result
-  ignore_errors: yes
-  no_log: True
-
 - name: "PM2 | Ensure installed"
   become: yes
+  become_user: root
+  npm:
+    name: "{{ item }}"
+    executable: "{{ fubarhouse_npm.npm_install_exec }}"
+    global: yes
+  with_items:
+    - "pm2"
+
+- name: "PM2 | Create an executable"
+  become: yes
   become_user: "root"
-  shell: "{{ fubarhouse_npm.npm_install_exec }} install -g pm2"
-  when: "pm2_install_result.stat.exists == False"
+  file:
+    src: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
+    dest: "{{ fubarhouse_pm2.pm2_exec }}"
+    owner: "{{ fubarhouse_user }}"
+    mode: 0755
+    state: link
 
 - name: "PM2 | Checking folders"
   become: yes
@@ -23,14 +28,13 @@
   file:
     state: directory
     path: "{{ item.location }}"
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    owner: "{{ fubarhouse_user }}"
     recurse: yes
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
 
 - name: "PM2 | Ensure repositories are up to date"
   become: no
-  become_user: "{{ ansible_ssh_user }}"
+  become_user: "{{ fubarhouse_user }}"
   git:
     repo: "{{ item.repository }}"
     dest: "{{ item.location }}"
@@ -39,13 +43,13 @@
     force: yes
     accept_hostkey: yes
     version: master
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
 
 - name: "PM2 | Ensure application(s) are installed"
   become: yes
   become_user: "root"
   raw: "{{ fubarhouse_npm.npm_install_exec }} install --prefix {{ item.location }}"
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
 
 - name: PM2 | Copying configuration file when asked
   become: yes
@@ -54,9 +58,8 @@
     remote_src: yes
     src: "{{ item.location }}/{{ item.config.origin }}"
     dest: "{{ item.location }}/{{ item.config.destination }}"
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+    owner: "{{ fubarhouse_user }}"
+  with_items: "{{ node_apps }}"
   when: item.config is defined
 
 - name: PM2 | Create databases when requested
@@ -65,7 +68,7 @@
     collation: "utf8_general_ci"
     encoding: "utf8"
     state: present
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   when: item.database.name is defined
 
 - name: PM2 | Import database if provided
@@ -73,48 +76,48 @@
     state: import
     name: "{{ item.database.name }}"
     target: "{{ item.location }}/{{ item.database.file }}"
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   when: item.database.file is defined
 
 - name: PM2 | Run initialization scripts"
   become: yes
-  become_user: "{{ ansible_ssh_user }}"
-  shell: "{{ fubarhouse_npm.nvm_symlink_exec }} run v{{ fubarhouse_npm.node_version }} {{ item.location }}/{{ item.init }}"
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  become_user: "{{ fubarhouse_user }}"
+  shell: "{{ fubarhouse_npm.nvm_symlink_exec }} run v{{ node_version }} {{ item.location }}/{{ item.init }}"
+  with_items: "{{ node_apps }}"
   when: item.init is defined
 
 - name: "PM2 | Ensure started"
   become: yes
-  become_user: "{{ ansible_ssh_user }}"
+  become_user: "{{ fubarhouse_user }}"
   raw: "{{ fubarhouse_pm2.pm2_exec }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   ignore_errors: yes
 
 - name: "PM2 | Flush logs"
   become: yes
-  become_user: "{{ ansible_ssh_user }}"
+  become_user: "{{ fubarhouse_user }}"
   raw: "{{ fubarhouse_pm2.pm2_exec }} flush"
 
 - name: "PM2 | Waiting for applications to load"
   wait_for:
     port: "{{ item.port }}"
     delay: 5
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
 
 - name: PM2 | Get status"
   uri:
     url: "http://127.0.0.1:{{ item.port }}"
     status_code: 200
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   retries: 5
   delay: 5
   ignore_errors: yes
 
 - name: "PM2 | Reloading applications"
   become: yes
-  become_user: "{{ ansible_ssh_user }}"
+  become_user: "{{ fubarhouse_user }}"
   raw: "{{ fubarhouse_pm2.pm2_exec }} reload '{{ item.name }}'"
-  with_items: "{{ fubarhouse_pm2.node_apps }}"
+  with_items: "{{ node_apps }}"
   ignore_errors: yes
 
 - name: "PM2 | Importing tasks for Apache"

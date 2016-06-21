@@ -1,20 +1,15 @@
 ---
 
-# file: roles/fubarhouse.pm2/defaults/main.yml
-
-fubarhouse_pm2:
-  pm2_exec: "/usr/local/bin/pm2"
-  vhost_domain_ext: "dev"
-  node_apps:
-    - name: myApp
-      port: 3000
-      location: /opt/myapp
-      start: app.js
-      init: reset.js
-      repository: ssh://git@bitbucket.org/mybitbucket/myapp.git
-      database:
-        name: myapp
-        file: database.sql
-      config:
-        origin: config/local-example.js
-        destination: config/local.js
+node_apps:
+  - name: myApp
+    port: 3000
+    location: /opt/myapp
+    start: app.js
+    init: reset.js
+    repository: ssh://git@bitbucket.org/mybitbucket/myapp.git
+    database:
+      name: myapp
+      file: database.sql
+    config:
+      origin: config/local-example.js
+      destination: config/local.js
