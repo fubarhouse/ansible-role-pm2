@@ -12,15 +12,16 @@
   with_items:
     - "pm2"
 
-- name: "PM2 | Create an executable"
+- name: "PM2 | Define executable"
   become: yes
-  become_user: "root"
-  file:
-    src: "/usr/local/lib/node_modules/pm2/bin/pm2"
-    dest: "{{ fubarhouse_pm2.pm2_exec }}"
-    owner: "{{ fubarhouse_user }}"
-    mode: 0755
-    state: link
+  become_user: "{{ fubarhouse_user }}"
+  command: "which pm2"
+  register: pm2_exec
+  when: pm2_exec is not defined
+
+- name: PM2 | Debug
+  debug:
+    msg: "{{ pm2_exec }}"
 
 - name: "PM2 | Checking folders"
   become: yes
@@ -63,6 +64,8 @@
   when: item.config is defined
 
 - name: PM2 | Create databases when requested
+  become: yes
+  become_user: "root"
   mysql_db:
     name: "{{ item.database.name }}"
     collation: "utf8_general_ci"
@@ -72,6 +75,8 @@
   when: item.database.name is defined
 
 - name: PM2 | Import database if provided
+  become: yes
+  become_user: "root"
   mysql_db:
     state: import
     name: "{{ item.database.name }}"
@@ -89,14 +94,14 @@
 - name: "PM2 | Ensure started"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ fubarhouse_pm2.pm2_exec }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
+  raw: "{{ pm2_exec.stdout }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
 
 - name: "PM2 | Flush logs"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ fubarhouse_pm2.pm2_exec }} flush"
+  raw: "{{ pm2_exec.stdout }} flush"
 
 - name: "PM2 | Waiting for applications to load"
   wait_for:
@@ -116,7 +121,7 @@
 - name: "PM2 | Reloading applications"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ fubarhouse_pm2.pm2_exec }} reload '{{ item.name }}'"
+  raw: "{{ pm2_exec.stdout }} reload '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
 
