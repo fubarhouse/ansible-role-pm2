@@ -15,13 +15,9 @@
 - name: "PM2 | Define executable"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  command: "which pm2"
-  register: pm2_exec
+  set_fact:
+    pm2_exec: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/bin/pm2"
   when: pm2_exec is not defined
-
-- name: PM2 | Debug
-  debug:
-    msg: "{{ pm2_exec }}"
 
 - name: "PM2 | Checking folders"
   become: yes
@@ -94,14 +90,14 @@
 - name: "PM2 | Ensure started"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec.stdout }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
+  raw: "{{ pm2_exec }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
 
 - name: "PM2 | Flush logs"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec.stdout }} flush"
+  raw: "{{ pm2_exec }} flush"
 
 - name: "PM2 | Waiting for applications to load"
   wait_for:
@@ -121,7 +117,7 @@
 - name: "PM2 | Reloading applications"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec.stdout }} reload '{{ item.name }}'"
+  raw: "{{ pm2_exec }} reload '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
 
