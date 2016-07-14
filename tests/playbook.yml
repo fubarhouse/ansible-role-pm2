@@ -4,6 +4,7 @@
   sudo: true
   vars:
     node_apps: []
+    node_packages: []
   roles:
     - { role: ../../fubarhouse.npm }
     - { role: ../../fubarhouse.pm2 }
