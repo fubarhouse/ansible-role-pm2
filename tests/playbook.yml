@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  sudo: true
+  vars:
+    node_apps: []
+  roles:
+    - { role: ../../fubarhouse.npm }
+    - { role: ../../fubarhouse.dvm }
