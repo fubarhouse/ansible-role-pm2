@@ -6,5 +6,5 @@
     node_apps: []
   roles:
     - { role: ../../fubarhouse.npm }
-    - { role: ../../fubarhouse.dvm }
+    - { role: ../../fubarhouse.pm2 }
 
