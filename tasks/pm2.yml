@@ -28,6 +28,7 @@
     owner: "{{ fubarhouse_user }}"
     recurse: yes
   with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
 
 - name: "PM2 | Ensure repositories are up to date"
   become: no
@@ -41,12 +42,14 @@
     accept_hostkey: yes
     version: master
   with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
 
 - name: "PM2 | Ensure application(s) are installed"
   become: yes
   become_user: "root"
   raw: "{{ fubarhouse_npm.npm_install_exec }} install --prefix {{ item.location }}"
   with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
 
 - name: PM2 | Copying configuration file when asked
   become: yes
@@ -57,7 +60,7 @@
     dest: "{{ item.location }}/{{ item.config.destination }}"
     owner: "{{ fubarhouse_user }}"
   with_items: "{{ node_apps }}"
-  when: item.config is defined
+  when: item.config is defined and node_apps.0 is defined
 
 - name: PM2 | Create databases when requested
   become: yes
@@ -68,7 +71,7 @@
     encoding: "utf8"
     state: present
   with_items: "{{ node_apps }}"
-  when: item.database.name is defined
+  when: item.database.name is defined and node_apps.0 is defined
 
 - name: PM2 | Import database if provided
   become: yes
@@ -78,14 +81,14 @@
     name: "{{ item.database.name }}"
     target: "{{ item.location }}/{{ item.database.file }}"
   with_items: "{{ node_apps }}"
-  when: item.database.file is defined
+  when: item.database.file is defined and node_apps.0 is defined
 
 - name: PM2 | Run initialization scripts"
   become: yes
   become_user: "{{ fubarhouse_user }}"
   shell: "{{ fubarhouse_npm.nvm_symlink_exec }} run v{{ node_version }} {{ item.location }}/{{ item.init }}"
   with_items: "{{ node_apps }}"
-  when: item.init is defined
+  when: item.init is defined and node_apps.0 is defined
 
 - name: "PM2 | Ensure started"
   become: yes
@@ -93,17 +96,20 @@
   raw: "{{ pm2_exec }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
+  when: node_apps.0 is defined
 
 - name: "PM2 | Flush logs"
   become: yes
   become_user: "{{ fubarhouse_user }}"
   raw: "{{ pm2_exec }} flush"
+  when: node_apps.0 is defined
 
 - name: "PM2 | Waiting for applications to load"
   wait_for:
     port: "{{ item.port }}"
     delay: 5
   with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
 
 - name: PM2 | Get status"
   uri:
@@ -113,6 +119,7 @@
   retries: 5
   delay: 5
   ignore_errors: yes
+  when: node_apps.0 is defined
 
 - name: "PM2 | Reloading applications"
   become: yes
@@ -120,6 +127,7 @@
   raw: "{{ pm2_exec }} reload '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
+  when: node_apps.0 is defined
 
 - name: "PM2 | Importing tasks for Apache"
   include: "vhost-apache.yml"
