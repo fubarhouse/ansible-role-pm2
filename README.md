@@ -1,5 +1,7 @@
 # Ansible Role: PM2
 
+[![Build Status](https://travis-ci.org/fubarhouse/fubarhouse.pm2.svg?branch=master)](https://travis-ci.org/fubarhouse/fubarhouse.pm2)
+
 * Install PM2 - A node application manager
 * Clone/Pull node applications from remote repositories
 * Install node packages required for each specified application
