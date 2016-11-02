@@ -1,6 +1,6 @@
 # Ansible Role: PM2
 
-[![Build Status](https://travis-ci.org/fubarhouse/fubarhouse.pm2.svg?branch=master)](https://travis-ci.org/fubarhouse/fubarhouse.pm2)
+[![Build Status](https://travis-ci.org/fubarhouse/ansible-role-pm2.svg?branch=master)](https://travis-ci.org/fubarhouse/ansible-role-pm2)
 
 * Install PM2 - A node application manager
 * Clone/Pull node applications from remote repositories
@@ -38,7 +38,7 @@ Configure each node application as an array item in `node_apps`.
 
 ## Dependencies
 
-* Role: fubarhouse.npm
+* Role: fubarhouse.nodejs
 
 ## Example Playbook
 

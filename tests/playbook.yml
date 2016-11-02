@@ -4,12 +4,11 @@
   sudo: true
   vars:
     ansible_ssh_user: root
-    node_version: 6.2.2
-    node_versions:
-      - 6.2.2
+    node_version: 7.0.0
+    node_versions: []
     node_packages:
       - grunt
     node_apps: []
   roles:
-    - { role: ../../fubarhouse.npm }
-    - { role: ../../fubarhouse.pm2 }
+    - { role: ../../ansible-role-nodejs }
+    - { role: ../../ansible-role-pm2 }
