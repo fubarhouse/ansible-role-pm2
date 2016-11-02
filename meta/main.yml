@@ -1,7 +1,6 @@
 ---
 
-dependencies:
-  - { role: fubarhouse.npm }
+dependencies: []
 
 galaxy_info:
   author: fubarhouse
