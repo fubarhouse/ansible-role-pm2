@@ -3,12 +3,12 @@
 - hosts: localhost
   sudo: true
   vars:
-    ansible_ssh_user: root
+    ansible_ssh_user: travis
     node_version: 7.0.0
     node_versions: []
     node_packages:
       - grunt
     node_apps: []
   roles:
-    - { role: ../../ansible-role-nodejs }
+    - { role: ../../fubarhouse.nodejs }
     - { role: ../../ansible-role-pm2 }
