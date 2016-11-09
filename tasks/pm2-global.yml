@@ -1,0 +1,37 @@
+---
+
+- name: "PM2 | Define variables"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  set_fact:
+    pm2_exec: "/usr/local/node_modules/pm2/bin/pm2"
+    node_path: "/usr/local"
+
+- name: "PM2 | Remove local installations"
+  become: yes
+  become_user: root
+  file:
+    path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ item }}/lib/node_modules/pm2"
+    state: absent
+  with_items:
+    - 4.0.0
+    - 5.0.0
+    - 7.0.0
+
+- name: "PM2 | Ensure installed"
+  become: yes
+  become_user: root
+  npm:
+    name: "{{ item }}"
+    executable: "{{ fubarhouse_npm.npm_install_exec }}"
+    global: yes
+  with_items:
+    - "pm2"
+
+# I simply do not trust global installs via ansible... /sigh
+- name: "PM2 | Re-ensure installed"
+  become: yes
+  become_user: root
+  shell: "{{ fubarhouse_npm.npm_install_exec }} install -g {{ item }}"
+  with_items:
+    - "pm2"
