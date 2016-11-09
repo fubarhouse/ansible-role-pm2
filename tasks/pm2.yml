@@ -2,22 +2,13 @@
 
 # file: roles/fubarhouse.pm2/tasks/pm2.yml
 
-- name: "PM2 | Ensure installed"
-  become: yes
-  become_user: root
-  npm:
-    name: "{{ item }}"
-    executable: "{{ fubarhouse_npm.npm_install_exec }}"
-    global: yes
-  with_items:
-    - "pm2"
+- name: "PM2 | Include local tasks"
+  include: pm2-local.yml
+  when: '"{{ pm2_install_type }}" == "local"'
 
-- name: "PM2 | Define executable"
-  become: yes
-  become_user: "{{ fubarhouse_user }}"
-  set_fact:
-    pm2_exec: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/bin/pm2"
-  when: pm2_exec is not defined
+- name: "PM2 | Include global tasks"
+  include: pm2-global.yml
+  when: '"{{ pm2_install_type }}" == "global"'
 
 - name: "PM2 | Checking folders"
   become: yes
