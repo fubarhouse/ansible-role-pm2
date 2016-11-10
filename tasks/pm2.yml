@@ -67,4 +67,4 @@
 
 - name: "PM2 | Verify installation"
   assert:
-    that: '"pm2 show" in "{{ pm2_verify.stdout_lines }}"'
+    that: '"pm2 show" in "{{ pm2_verify.stdout }}"'
