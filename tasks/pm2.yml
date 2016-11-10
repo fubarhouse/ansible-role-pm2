@@ -56,7 +56,7 @@
 
 - name: "PM2 | Symlink custom install"
   file:
-    src: "{{ pm2_custom_path }}/lib/node_modules/pm2/bin/pm2"
+    src: "{{ pm2_custom_path }}/node_modules/pm2/bin/pm2"
     dest: /usr/local/bin/pm2
     state: link
   when: pm2_install_type == "custom"

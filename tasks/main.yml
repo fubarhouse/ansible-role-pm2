@@ -31,7 +31,7 @@
   when: pm2_install_type != "custom" and pm2_custom_path is undefined
 
 - name: "Scanning for Apache2"
-  shell:
+  stat:
     path: /usr/sbin/apache2
   register: apache2_isinstalled
 
