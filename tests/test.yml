@@ -1,0 +1,16 @@
+---
+
+- hosts: localhost
+  sudo: true
+  vars:
+    node_version: 7.0.0
+    node_versions:
+      - 6.0.0
+    node_packages:
+      - grunt
+    node_apps: []
+  roles:
+    - andrewrothstein.curl
+    - geerlingguy.git
+    - fubarhouse.nodejs
+    - role_under_test
