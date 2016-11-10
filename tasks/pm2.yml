@@ -62,9 +62,9 @@
   when: pm2_install_type == "custom"
 
 - name: "PM2 | Run PM2"
-  shell: /usr/local/bin/pm2 list | grep "<id|name>"
+  shell: /usr/local/bin/pm2 list
   register: pm2_verify
 
 - name: "PM2 | Verify installation"
   assert:
-    that: '"pm2 show <id|name>" in "{{ pm2_verify.stdout }}"'
+    that: '"pm2 show" in "{{ pm2_verify.stdout_lines }}"'
