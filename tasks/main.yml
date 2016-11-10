@@ -28,10 +28,10 @@
 - name: "Set to global install if unset"
   set_fact:
     pm2_install_type: global
-  when: pm2_install_type is undefined
+  when: pm2_install_type != "custom" and pm2_custom_path is undefined
 
 - name: "Scanning for Apache2"
-  stat:
+  shell:
     path: /usr/sbin/apache2
   register: apache2_isinstalled
 
@@ -42,3 +42,6 @@
 
 - name: "Importing PM2 Tasks"
   include: pm2.yml
+
+- name: "Importing NodeJS Application Tasks"
+  include: apps.yml
