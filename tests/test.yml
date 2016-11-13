@@ -2,7 +2,7 @@
 
 - hosts: localhost
   sudo: true
-  vars:
+  vars: #
     node_version: 7.0.0
     node_versions:
       - 6.0.0
