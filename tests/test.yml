@@ -10,7 +10,7 @@
       - grunt
     node_apps: []
   roles:
-    - andrewrothstein.curl
     - geerlingguy.git
+    - fubarhouse.curl
     - fubarhouse.nodejs
     - role_under_test

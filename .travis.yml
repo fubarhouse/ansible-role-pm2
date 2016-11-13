@@ -3,12 +3,24 @@
 services: docker
 
 env:
+  - distro: centos6
+    init: /sbin/init
+    run_opts: ""
   - distro: centos7
     init: /usr/lib/systemd/systemd
     run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
+  - distro: fedora24
+    init: /sbin/init
+    run_opts: ""
+  - distro: ubuntu1204
+    init: /sbin/init
+    run_opts: ""
   - distro: ubuntu1404
     init: /sbin/init
     run_opts: ""
+  - distro: ubuntu1604
+    init: /lib/systemd/systemd
+    run_opts: "--privileged --volume=/sys/fs/cgroup:/sys/fs/cgroup:ro"
 
 before_install:
 
@@ -22,8 +34,8 @@ script:
   - 'docker run --detach --volume="${PWD}":/etc/ansible/roles/role_under_test:ro ${run_opts} geerlingguy/docker-${distro}-ansible:latest "${init}" > "${container_id}"'
 
   # Install dependencies.
-  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install andrewrothstein.curl'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install geerlingguy.git'
+  - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install fubarhouse.curl'
   - 'sudo docker exec --tty "$(cat ${container_id})" env TERM=xterm ansible-galaxy install fubarhouse.nodejs'
 
   # Ansible syntax check.
