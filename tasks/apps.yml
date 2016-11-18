@@ -73,7 +73,7 @@
 
 - name: "PM2 | Ensure started"
   become: yes
-  become_user: "{{ fubarhouse_user }}"
+  become_user: "{{   fubarhouse_user }}"
   shell: "/usr/local/bin/pm2 start {{ item.location }}/{{ item.start }} --name '{{ item.name }}' | cat"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
