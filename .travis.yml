@@ -21,6 +21,9 @@ env:
 
 before_install:
 
+  # Remove NVM prior to installation
+  - 'rm -rf ~/.nvm'
+
   # Pull container.
   - 'docker pull geerlingguy/docker-${distro}-ansible:latest'
 
