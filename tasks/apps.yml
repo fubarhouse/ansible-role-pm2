@@ -76,7 +76,6 @@
   become_user: "{{   fubarhouse_user }}"
   shell: "/usr/local/bin/pm2 start {{ item.location }}/{{ item.start }} --name '{{ item.name }}' | cat"
   with_items: "{{ node_apps }}"
-  ignore_errors: yes
   when: node_apps.0 is defined
 
 - name: "PM2 | Flush logs"
