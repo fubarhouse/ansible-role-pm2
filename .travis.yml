@@ -49,7 +49,7 @@ script:
   - docker exec "$(cat ${container_id})" ansible-playbook /etc/ansible/roles/role_under_test/tests/test.yml | tee -a ${idempotence}
   - >
     tail ${idempotence}
-    | grep -q 'changed=9.*failed=0'
+    | grep -q 'unreachable=0.*failed=0'
     && (echo 'Idempotence test: pass' && exit 0)
     || (echo 'Idempotence test: fail' && exit 1)
 
