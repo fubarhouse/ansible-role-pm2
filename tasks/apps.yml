@@ -110,6 +110,12 @@
   ignore_errors: yes
   when: node_apps.0 is defined
 
+- name: "PM2 | Flush logs"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 flush | cat"
+  when: node_apps.0 is defined
+
 - name: "PM2 | Importing tasks for Apache"
   include: "vhost-apache.yml"
   when: apache2_isinstalled is defined
