@@ -78,11 +78,13 @@
   with_items: "{{ node_apps }}"
   when: node_apps.0 is defined
 
-- name: "PM2 | Flush logs"
+- name: "PM2 | Ensure application is registered"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  when: node_apps.0 is defined
   shell: "/usr/local/bin/pm2 show '{{ item.name }}' | cat"
+  with_items: "{{ node_apps }}"
+  register: pm2_registered_apps
+  changed_when: false
 
 - name: "PM2 | Waiting for applications to load"
   wait_for:
