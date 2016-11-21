@@ -43,13 +43,13 @@
 - name: "PM2 | Flush logs"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec }} flush"
+  raw: "/usr/local/bin/pm2 flush"
   when: node_apps.0 is defined
 
 - name: "PM2 | Ensure stopped"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec }} stop '{{ item.name }}'"
+  raw: "/usr/local/bin/pm2 stop '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
   when: node_apps.0 is defined

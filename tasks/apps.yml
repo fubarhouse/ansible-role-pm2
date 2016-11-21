@@ -28,7 +28,7 @@
 - name: "PM2 | Ensure application(s) are installed"
   become: yes
   become_user: "root"
-  raw: "{{ fubarhouse_npm.npm_install_exec }} install --prefix {{ item.location }}"
+  shell: "{{ fubarhouse_npm.npm_install_exec }} install --prefix {{ item.location }}"
   with_items: "{{ node_apps }}"
   when: node_apps.0 is defined
 
@@ -73,17 +73,18 @@
 
 - name: "PM2 | Ensure started"
   become: yes
-  become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec }} start {{ item.location }}/{{ item.start }} --name '{{ item.name }}'"
+  become_user: "{{   fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 start {{ item.location }}/{{ item.start }} --name '{{ item.name }}' | cat"
   with_items: "{{ node_apps }}"
-  ignore_errors: yes
   when: node_apps.0 is defined
 
-- name: "PM2 | Flush logs"
+- name: "PM2 | Ensure application is registered"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec }} flush"
-  when: node_apps.0 is defined
+  shell: "/usr/local/bin/pm2 show '{{ item.name }}' | cat"
+  with_items: "{{ node_apps }}"
+  register: pm2_registered_apps
+  changed_when: false
 
 - name: "PM2 | Waiting for applications to load"
   wait_for:
@@ -105,9 +106,15 @@
 - name: "PM2 | Reloading applications"
   become: yes
   become_user: "{{ fubarhouse_user }}"
-  raw: "{{ pm2_exec }} reload '{{ item.name }}'"
+  shell: "/usr/local/bin/pm2 reload '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
+  when: node_apps.0 is defined
+
+- name: "PM2 | Flush logs"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 flush | cat"
   when: node_apps.0 is defined
 
 - name: "PM2 | Importing tasks for Apache"

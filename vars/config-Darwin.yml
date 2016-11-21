@@ -5,5 +5,4 @@
 fubarhouse_pm2:
   user: "{{ fubarhouse_user }}"
   user_dir: "/Users/{{ fubarhouse_user }}"
-  pm2_exec: "/usr/local/bin/pm2"
   vhost_domain_ext: "loc.gbuild.net"
