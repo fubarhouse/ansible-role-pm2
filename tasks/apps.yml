@@ -1,70 +1,141 @@
 ---
 
-# file: roles/fubarhouse.pm2/tasks/pm2.yml
-
-- name: "PM2 | Locate NPM"
-  shell: which npm | cat
-  register: which_npm
-
-- name: "Include cleanup tasks"
-  include: cleanup.yml
-  when: pm2_clean_install
-
-- name: "PM2 | Set global paths"
-  set_fact:
-    pm2_install_path: "/usr/local/lib"
-    pm2_sym_path: "/usr/local/lib/node_modules/pm2/bin/pm2"
-  when: pm2_install_type == "global"
-
-- name: "PM2 | Set local paths"
-  set_fact:
-    pm2_install_path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib"
-    pm2_sym_path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
-  when: pm2_install_type == "local"
-
-- name: "PM2 | Set custom paths"
-  set_fact:
-    pm2_install_path: "{{ pm2_custom_path }}"
-    pm2_sym_path: "{{ pm2_custom_path }}/node_modules/pm2/bin/pm2"
-  when: pm2_install_type == "custom"
-
-- name: "PM2 | Install (the right way)"
+- name: "PM2 | Checking folders"
   become: yes
   become_user: root
-  npm:
-    name: "pm2"
-    executable: "{{ which_npm.stdout }}"
-    state: latest
-    path: "{{ pm2_install_path }}"
+  file:
+    state: directory
+    path: "{{ item.location }}"
+    owner: "{{ fubarhouse_user }}"
+    recurse: yes
+  with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
 
-- name: "PM2 | Touch"
+- name: "PM2 | Ensure repositories are up to date"
+  become: no
+  become_user: "{{ fubarhouse_user }}"
+  git:
+    repo: "{{ item.repository }}"
+    dest: "{{ item.location }}"
+    clone: yes
+    update: yes
+    force: yes
+    accept_hostkey: yes
+    version: master
+  with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
+
+- name: "PM2 | Ensure application(s) are installed"
+  become: yes
+  become_user: "root"
+  shell: "{{ fubarhouse_npm.npm_install_exec }} install --prefix {{ item.location }}"
+  with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
+
+- name: PM2 | Copying configuration file when asked
   become: yes
   become_user: root
-  stat:
-    path: "{{ pm2_sym_path }}"
+  copy:
+    remote_src: yes
+    src: "{{ item.location }}/{{ item.config.origin }}"
+    dest: "{{ item.location }}/{{ item.config.destination }}"
+    owner: "{{ fubarhouse_user }}"
+  with_items: "{{ node_apps }}"
+  when: item.config is defined and node_apps.0 is defined
+
+- name: PM2 | Create databases when requested
+  become: yes
+  become_user: "root"
+  mysql_db:
+    name: "{{ item.database.name }}"
+    collation: "utf8_general_ci"
+    encoding: "utf8"
+    state: present
+  with_items: "{{ node_apps }}"
+  when: item.database.name is defined and node_apps.0 is defined
+
+- name: PM2 | Import database if provided
+  become: yes
+  become_user: "root"
+  mysql_db:
+    state: import
+    name: "{{ item.database.name }}"
+    target: "{{ item.location }}/{{ item.database.file }}"
+  with_items: "{{ node_apps }}"
+  when: item.database.file is defined and node_apps.0 is defined
+
+- name: PM2 | Run initialization scripts"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "{{ fubarhouse_npm.nvm_symlink_exec }} run v{{ node_version }} {{ item.location }}/{{ item.init }}"
+  with_items: "{{ node_apps }}"
+  when: item.init is defined and node_apps.0 is defined
+
+- name: "PM2 | Kill daemon"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: '/usr/local/bin/pm2 kill'
   changed_when: false
   failed_when: false
-  register: pm2_file_check
+  when: pm2_clean_install != true
 
-- name: "PM2 | Install (the wrong way)"
+- name: "PM2 | Start daemon"
   become: yes
-  become_user: root
-  shell: "npm install pm2"
-  args:
-    chdir: "{{ pm2_install_path }}"
-    creates: "{{ pm2_sym_path }}"
-  when: not pm2_file_check.stat.exists
+  become_user: "{{ fubarhouse_user }}"
+  shell: '/usr/local/bin/pm2 start'
+  changed_when: false
+  failed_when: false
 
-- name: "PM2 | Symlink"
-  file:
-    src: "{{ pm2_sym_path }}"
-    dest: /usr/local/bin/pm2
-    state: link
+- name: "PM2 | Ensure started"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 start {{ item.location }}/{{ item.start }} --name '{{ item.name }}' | cat"
+  with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
 
-- name: "PM2 | Run PM2"
-  shell: /usr/local/bin/pm2 list
-  register: pm2_verify
+- name: "PM2 | Ensure application is registered"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 show '{{ item.name }}' | cat"
+  with_items: "{{ node_apps }}"
+  register: pm2_registered_apps
+  changed_when: false
 
-- name: "PM2 | Verify installation"
-  assert:
-    that: '"pm2 show" in "{{ pm2_verify.stdout }}"'
+- name: "PM2 | Waiting for applications to load"
+  wait_for:
+    port: "{{ item.port }}"
+    delay: 5
+  with_items: "{{ node_apps }}"
+  when: node_apps.0 is defined
+
+- name: PM2 | Get status"
+  uri:
+    url: "http://127.0.0.1:{{ item.port }}"
+    status_code: 200
+  with_items: "{{ node_apps }}"
+  retries: 5
+  delay: 5
+  ignore_errors: yes
+  when: node_apps.0 is defined
+
+- name: "PM2 | Reloading applications"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 reload '{{ item.name }}'"
+  with_items: "{{ node_apps }}"
+  ignore_errors: yes
+  when: node_apps.0 is defined
+
+- name: "PM2 | Flush logs"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: "/usr/local/bin/pm2 flush | cat"
+  when: node_apps.0 is defined
+
+- name: "PM2 | Importing tasks for Apache"
+  include: "vhost-apache.yml"
+  when: apache2_isinstalled is defined
+
+- name: "PM2 | Importing tasks for Nginx"
+  include: "vhost-nginx.yml"
+  when: nginx_isinstalled is defined

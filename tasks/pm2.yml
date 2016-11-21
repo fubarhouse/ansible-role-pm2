@@ -10,56 +10,56 @@
   include: cleanup.yml
   when: pm2_clean_install
 
-- name: "PM2 | Ensure installed (global)"
+- name: "PM2 | Set global paths"
+  set_fact:
+    pm2_install_path: "/usr/local/lib"
+    pm2_sym_path: "/usr/local/lib/node_modules/pm2/bin/pm2"
+  when: pm2_install_type == "global"
+
+- name: "PM2 | Set local paths"
+  set_fact:
+    pm2_install_path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib"
+    pm2_sym_path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
+  when: pm2_install_type == "local"
+
+- name: "PM2 | Set custom paths"
+  set_fact:
+    pm2_install_path: "{{ pm2_custom_path }}"
+    pm2_sym_path: "{{ pm2_custom_path }}/node_modules/pm2/bin/pm2"
+  when: pm2_install_type == "custom"
+
+- name: "PM2 | Install (the right way)"
   become: yes
   become_user: root
   npm:
     name: "pm2"
     executable: "{{ which_npm.stdout }}"
     state: latest
-    path: "/usr/local/lib"
-  when: pm2_install_type == "global"
+    path: "{{ pm2_install_path }}"
 
-- name: "PM2 | Symlink global install"
-  file:
-    src: /usr/local/lib/node_modules/pm2/bin/pm2
-    dest: /usr/local/bin/pm2
-    state: link
-  when: pm2_install_type == "global"
-
-- name: "PM2 | Ensure installed (local)"
+- name: "PM2 | Touch"
   become: yes
-  become_user: "root"
-  npm:
-    name: "pm2"
-    executable: "{{ which_npm.stdout }}"
-    state: latest
-    path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib"
-  when: pm2_install_type == "local"
+  become_user: root
+  stat:
+    path: "{{ pm2_sym_path }}"
+  changed_when: false
+  failed_when: false
+  register: pm2_file_check
 
-- name: "PM2 | Symlink local install"
-  file:
-    src: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
-    dest: /usr/local/bin/pm2
-    state: link
-  when: pm2_install_type == "local"
-
-- name: "PM2 | Ensure installed (custom)"
+- name: "PM2 | Install (the wrong way)"
   become: yes
-  become_user: "root"
-  npm:
-    name: "pm2"
-    executable: "{{ which_npm.stdout }}"
-    path: "{{ pm2_custom_path }}"
-    state: latest
-  when: pm2_install_type == "custom"
+  become_user: root
+  shell: "npm install pm2"
+  args:
+    chdir: "{{ pm2_install_path }}"
+    creates: "{{ pm2_sym_path }}"
+  when: not pm2_file_check.stat.exists
 
-- name: "PM2 | Symlink custom install"
+- name: "PM2 | Symlink"
   file:
-    src: "{{ pm2_custom_path }}/node_modules/pm2/bin/pm2"
+    src: "{{ pm2_sym_path }}"
     dest: /usr/local/bin/pm2
     state: link
-  when: pm2_install_type == "custom"
 
 - name: "PM2 | Run PM2"
   shell: /usr/local/bin/pm2 list
