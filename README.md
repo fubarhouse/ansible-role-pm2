@@ -39,6 +39,8 @@ pm2_custom_path: /usr/local
 
 Configure each node application as an array item in `node_apps`.
 
+This unique configuration is required by you unless you use `node_apps: []`, otherwise this role **will** fail.
+
 ````
 node_apps:
   - name: myApp

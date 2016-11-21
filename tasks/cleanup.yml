@@ -9,6 +9,14 @@
     - "{{ node_versions }}"
   when: pm2_install_type != "local" or pm2_clean_install == true
 
+- name: "PM2 | Kill daemon"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: '/usr/local/bin/pm2 kill'
+  changed_when: false
+  failed_when: false
+  when: pm2_clean_install == true
+
 - name: "PM2 | Remove local PM2 directory"
   file:
     path: "{{ item.invocation.module_args.path }}"

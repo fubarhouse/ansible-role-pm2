@@ -71,6 +71,21 @@
   with_items: "{{ node_apps }}"
   when: item.init is defined and node_apps.0 is defined
 
+- name: "PM2 | Kill daemon"
+  become: yes
+  become_user: "{{   fubarhouse_user }}"
+  shell: '/usr/local/bin/pm2 kill'
+  changed_when: false
+  failed_when: false
+  when: pm2_clean_install != true
+
+- name: "PM2 | Start daemon"
+  become: yes
+  become_user: "{{ fubarhouse_user }}"
+  shell: '/usr/local/bin/pm2 start'
+  changed_when: false
+  failed_when: false
+
 - name: "PM2 | Ensure started"
   become: yes
   become_user: "{{   fubarhouse_user }}"
