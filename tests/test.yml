@@ -1,50 +1,7 @@
 ---
 
-- hosts: localhost
-  sudo: true
-  vars: #
-    node_version: 7.0.0
-    node_versions:
-      - 6.0.0
-    node_packages:
-      - grunt
+- hosts: all
+  vars:
     node_apps: []
-    fubarhouse_npm:
-      # User
-      user: "{{ fubarhouse_user }}"
-      user_dir: "/home/{{ fubarhouse_user }}"
-      # Shell profiles
-      shell_profiles:
-        - { filename: .profile }
-        - { filename: .bashrc }
-        - { filename: .bash_profile }
-      # Application versions
-      nvm_version: 0.31.0
-      # Clean install
-      clean_install: true
-      # Process controls
-      install_nvm: true
-      install_ivm: true
-      install_nodejs: true
-      install_iojs: true
-      install_npm: true
-      # Repositories
-      nvm_repo: "https://github.com/xtuple/nvm.git"
-      # Symlinks
-      nvm_symlink_exec: "/usr/local/bin/nvm"
-      # Install directories
-      nvm_install_dir: "/home/{{ fubarhouse_user }}/.nvm"
-      folder_paths:
-       - { path: "/usr/local/lib/node_modules" }
-       - { path: "/home/{{ fubarhouse_user }}/.npm" }
-       - { path: "/home/{{ fubarhouse_user }}/.nvm" }
-      # Install paths
-      nvm_install_path: ""
-      # Executables
-      nvm_install_exec: "nvm_bin.sh"
-      npm_install_exec: "/usr/local/bin/npm"
   roles:
-    - geerlingguy.git
-    - fubarhouse.curl
-    - fubarhouse.nodejs
     - role_under_test

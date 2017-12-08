@@ -5,6 +5,7 @@
 - name: "PM2 | Locate NPM"
   shell: which npm | cat
   register: which_npm
+  changed_when: false
 
 - name: "Include cleanup tasks"
   include: cleanup.yml
@@ -18,8 +19,8 @@
 
 - name: "PM2 | Set local paths"
   set_fact:
-    pm2_install_path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib"
-    pm2_sym_path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
+    pm2_install_path: "{{ fubarhouse_user_dir }}/.nvm/v{{ node_version }}/lib"
+    pm2_sym_path: "{{ fubarhouse_user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
   when: pm2_install_type == "local"
 
 - name: "PM2 | Set custom paths"
@@ -28,43 +29,32 @@
     pm2_sym_path: "{{ pm2_custom_path }}/node_modules/pm2/bin/pm2"
   when: pm2_install_type == "custom"
 
-- name: "PM2 | Install (the right way)"
-  become: yes
-  become_user: root
+- name: "PM2 | Install"
   npm:
     name: "pm2"
     executable: "{{ which_npm.stdout }}"
     state: latest
     path: "{{ pm2_install_path }}"
+  when: '"npm" not in which_npm.stdout'
 
 - name: "PM2 | Touch"
-  become: yes
-  become_user: root
   stat:
     path: "{{ pm2_sym_path }}"
   changed_when: false
   failed_when: false
   register: pm2_file_check
-
-- name: "PM2 | Install (the wrong way)"
-  become: yes
-  become_user: root
-  shell: "npm install pm2"
-  args:
-    chdir: "{{ pm2_install_path }}"
-    creates: "{{ pm2_sym_path }}"
-  when: not pm2_file_check.stat.exists
+  when: '"npm" not in which_npm.stdout'
 
 - name: "PM2 | Symlink"
   file:
     src: "{{ pm2_sym_path }}"
     dest: /usr/local/bin/pm2
     state: link
-
-- name: "PM2 | Run PM2"
-  shell: /usr/local/bin/pm2 list
-  register: pm2_verify
+  when: '"npm" not in which_npm.stdout'
 
 - name: "PM2 | Verify installation"
-  assert:
-    that: '"pm2 show" in "{{ pm2_verify.stdout }}"'
+  shell: which pm2
+  register: pm2_verify
+  changed_when: false
+  failed_when: '"pm2" not in pm2_verify.stdout'
+

@@ -1,8 +1,0 @@
----
-
-# file: roles/fubarhouse.pm2/defaults/main.yml
-
-fubarhouse_pm2:
-  user: "{{ fubarhouse_user }}"
-  user_dir: "/home/{{ fubarhouse_user }}"
-  vhost_domain_ext: "loc.gbuild.net"

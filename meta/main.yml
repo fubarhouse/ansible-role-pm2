@@ -1,8 +1,6 @@
 ---
 
-dependencies:
-  - { role: fubarhouse.nodejs }
-
+dependencies: []
 galaxy_info:
   author: fubarhouse
   description: Provisions Node applications via PM2

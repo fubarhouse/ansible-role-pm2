@@ -2,7 +2,7 @@
 
 - name: "PM2 | Locate local PM2 directory"
   stat:
-    path: "{{ fubarhouse_pm2.user_dir }}/.nvm/v{{ item }}/lib/node_modules/pm2"
+    path: "{{ fubarhouse_user_dir }}/.nvm/v{{ item }}/lib/node_modules/pm2"
   register: pm2_local_directory
   with_items:
     - "{{ node_version }}"
@@ -10,8 +10,6 @@
   when: pm2_install_type != "local" or pm2_clean_install == true
 
 - name: "PM2 | Kill daemon"
-  become: yes
-  become_user: "{{ fubarhouse_user }}"
   shell: '/usr/local/bin/pm2 kill'
   changed_when: false
   failed_when: false
@@ -26,8 +24,6 @@
   when: (item.stat.exists == true and pm2_install_type != "local") or pm2_clean_install == true
 
 - name: "PM2 | Remove global executable"
-  become: yes
-  become_user: "root"
   file:
     path: "/usr/local/bin/pm2"
     state: absent
@@ -35,8 +31,6 @@
   when: pm2_install_type != "global" or pm2_clean_install == true
 
 - name: "PM2 | Remove global installations"
-  become: yes
-  become_user: root
   file:
     path: "/usr/local/lib/node_modules/{{ item }}"
     state: absent
@@ -49,22 +43,16 @@
   when: pm2_install_type != "global" or pm2_clean_install == true
 
 - name: "PM2 | Flush logs"
-  become: yes
-  become_user: "{{ fubarhouse_user }}"
   raw: "/usr/local/bin/pm2 flush"
   when: node_apps.0 is defined
 
 - name: "PM2 | Ensure stopped"
-  become: yes
-  become_user: "{{ fubarhouse_user }}"
   raw: "/usr/local/bin/pm2 stop '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
   when: node_apps.0 is defined
 
 - name: "PM2 | Remove global executable"
-  become: yes
-  become_user: "root"
   file:
     path: "/usr/local/bin/pm2"
     state: absent
