@@ -22,6 +22,13 @@
     fubarhouse_user_dir: "{{ shell_home_dir.stdout }}"
   when: fubarhouse_user_dir is not defined
 
+- name: "Install dependencies"
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - npm
+
 - name: "Importing PM2 Tasks"
   include: pm2.yml
 
