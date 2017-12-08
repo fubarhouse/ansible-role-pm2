@@ -11,23 +11,10 @@
   include: cleanup.yml
   when: pm2_clean_install
 
-- name: "PM2 | Set global paths"
+- name: "PM2 | Set paths"
   set_fact:
     pm2_install_path: "/usr/local/lib"
     pm2_sym_path: "/usr/local/lib/node_modules/pm2/bin/pm2"
-  when: pm2_install_type == "global"
-
-- name: "PM2 | Set local paths"
-  set_fact:
-    pm2_install_path: "{{ fubarhouse_user_dir }}/.nvm/v{{ node_version }}/lib"
-    pm2_sym_path: "{{ fubarhouse_user_dir }}/.nvm/v{{ node_version }}/lib/node_modules/pm2/bin/pm2"
-  when: pm2_install_type == "local"
-
-- name: "PM2 | Set custom paths"
-  set_fact:
-    pm2_install_path: "{{ pm2_custom_path }}"
-    pm2_sym_path: "{{ pm2_custom_path }}/node_modules/pm2/bin/pm2"
-  when: pm2_install_type == "custom"
 
 - name: "PM2 | Install"
   npm:

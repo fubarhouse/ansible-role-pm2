@@ -1,36 +1,19 @@
 ---
 
-- name: "PM2 | Locate local PM2 directory"
-  stat:
-    path: "{{ fubarhouse_user_dir }}/.nvm/v{{ item }}/lib/node_modules/pm2"
-  register: pm2_local_directory
-  with_items:
-    - "{{ node_version }}"
-    - "{{ node_versions }}"
-  when: pm2_install_type != "local" or pm2_clean_install == true
-
 - name: "PM2 | Kill daemon"
   shell: '/usr/local/bin/pm2 kill'
   changed_when: false
   failed_when: false
   when: pm2_clean_install == true
 
-- name: "PM2 | Remove local PM2 directory"
-  file:
-    path: "{{ item.invocation.module_args.path }}"
-    state: absent
-  with_items:
-    - "{{ pm2_local_directory.results }}"
-  when: (item.stat.exists == true and pm2_install_type != "local") or pm2_clean_install == true
-
-- name: "PM2 | Remove global executable"
+- name: "PM2 | Remove executable"
   file:
     path: "/usr/local/bin/pm2"
     state: absent
     force: yes
-  when: pm2_install_type != "global" or pm2_clean_install == true
+  when: pm2_clean_install == true
 
-- name: "PM2 | Remove global installations"
+- name: "PM2 | Remove installations"
   file:
     path: "/usr/local/lib/node_modules/{{ item }}"
     state: absent
@@ -40,7 +23,7 @@
     - pm2-axon-rpc
     - pm2-deploy
     - pm2-multimeter
-  when: pm2_install_type != "global" or pm2_clean_install == true
+  when: pm2_clean_install == true
 
 - name: "PM2 | Flush logs"
   raw: "/usr/local/bin/pm2 flush"
@@ -52,9 +35,9 @@
   ignore_errors: yes
   when: node_apps.0 is defined
 
-- name: "PM2 | Remove global executable"
+- name: "PM2 | Remove executable"
   file:
     path: "/usr/local/bin/pm2"
     state: absent
     force: yes
-  when: pm2_install_type != "global" or pm2_clean_install == true
+  when: pm2_clean_install == true

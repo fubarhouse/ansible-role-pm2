@@ -1,5 +1,4 @@
 ---
 
 pm2_clean_install: false
-pm2_install_type: global
 node_apps: []
