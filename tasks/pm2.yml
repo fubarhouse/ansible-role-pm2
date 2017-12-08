@@ -11,6 +11,11 @@
   include: cleanup.yml
   when: pm2_clean_install
 
+- name: "PM2 | Locate PM2"
+  shell: which pm2 | cat
+  register: which_pm2
+  changed_when: false
+
 - name: "PM2 | Set paths"
   set_fact:
     pm2_install_path: "/usr/local/lib"
@@ -21,23 +26,15 @@
     name: "pm2"
     executable: "{{ which_npm.stdout }}"
     state: latest
-    path: "{{ pm2_install_path }}"
-  when: '"npm" not in which_npm.stdout'
-
-- name: "PM2 | Touch"
-  stat:
-    path: "{{ pm2_sym_path }}"
-  changed_when: false
-  failed_when: false
-  register: pm2_file_check
-  when: '"npm" not in which_npm.stdout'
+    global: yes
+  when: '"pm2" not in which_pm2.stdout'
 
 - name: "PM2 | Symlink"
   file:
     src: "{{ pm2_sym_path }}"
     dest: /usr/local/bin/pm2
     state: link
-  when: '"npm" not in which_npm.stdout'
+  when: '"pm2" not in which_pm2.stdout'
 
 - name: "PM2 | Verify installation"
   shell: which pm2
