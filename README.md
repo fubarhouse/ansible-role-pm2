@@ -48,7 +48,7 @@ node_apps:
 
 ## Dependencies
 
-* Role: fubarhouse.nodejs
+* None.
 
 ## Example Playbook
 
