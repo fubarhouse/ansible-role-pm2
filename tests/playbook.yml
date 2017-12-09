@@ -31,4 +31,4 @@
       when: ansible_os_family == 'Debian'
 
   roles:
-    - ../../ansible-role-pm2/
+    - role_under_test
