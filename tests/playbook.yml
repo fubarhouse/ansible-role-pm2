@@ -1,6 +1,6 @@
 ---
 
-- hosts: all
+- hosts: localhost
   vars:
     node_apps: []
   pre_tasks:
@@ -19,5 +19,16 @@
       changed_when: false
       when: ansible_os_family == 'Debian'
       failed_when: false
+
+    - name: Install nodejs
+      shell: "{{ item }}"
+      with_items:
+        - apt-get install curl --yes
+        - curl -sL https://deb.nodesource.com/setup_6.x | bash -
+        - apt-get install nodejs --yes
+      changed_when: false
+      failed_when: false
+      when: ansible_os_family == 'Debian'
+
   roles:
-    - role_under_test
+    - ../../ansible-role-pm2/
