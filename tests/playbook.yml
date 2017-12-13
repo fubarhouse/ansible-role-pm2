@@ -4,7 +4,8 @@
   vars:
     nvm_install_dir: /home/travis/nvm_install_test
     node_version: 4.8.7
-    node_versions: []
+    node_versions:
+      - 4.8.7
     node_apps: []
   pre_tasks:
     - name: Update yum cache.
