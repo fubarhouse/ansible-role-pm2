@@ -24,4 +24,4 @@
 
   roles:
     - fubarhouse.nodejs
-    - ../../ansible-role-pm2
+    - role_under_test
