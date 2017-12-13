@@ -2,6 +2,8 @@
 
 - hosts: localhost
   vars:
+    node_version: 4.8.7
+    node_versions: []
     node_apps: []
   pre_tasks:
     - name: Update yum cache.
@@ -21,4 +23,5 @@
       failed_when: false
 
   roles:
-    - role_under_test
+    - fubarhouse.nodejs
+    - ../../ansible-role-pm2
