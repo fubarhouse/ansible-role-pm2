@@ -13,7 +13,6 @@
 * Run initialization script
 * Start application, and wait for response
 * Flush logs
-* Create virtual hosts on Debian (apache2 and nginx)
 
 ## Requirements
 
