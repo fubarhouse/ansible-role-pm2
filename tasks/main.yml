@@ -2,7 +2,7 @@
 # file: roles/fubarhouse.pm2/tasks/main.yml
 
 - name: "Importing dependencies"
-  include_tasks: depenencies.yml
+  include_tasks: dependencies.yml
 
 - name: "Import uninstall tasks"
   include_tasks: uninstall.yml
