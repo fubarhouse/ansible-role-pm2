@@ -21,4 +21,5 @@
       failed_when: false
 
   roles:
+    - fubarhouse.nodejs
     - role_under_test
