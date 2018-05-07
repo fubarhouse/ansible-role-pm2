@@ -16,7 +16,7 @@
   npm:
     name: "pm2"
     executable: "{{ which_npm.stdout }}"
-    state: latest
+    state: present
     global: yes
   when: '"pm2" not in which_pm2.stdout'
 
