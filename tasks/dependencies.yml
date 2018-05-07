@@ -1,0 +1,8 @@
+---
+
+- name: "Install dependencies"
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - npm

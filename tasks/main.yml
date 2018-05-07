@@ -1,36 +1,16 @@
 ---
 # file: roles/fubarhouse.pm2/tasks/main.yml
 
-- name: "Define user variable for ssh use"
-  set_fact:
-    fubarhouse_user: "{{ ansible_ssh_user }}"
-  when: ansible_ssh_user is defined and fubarhouse_user is not defined
+- name: "Importing dependencies"
+  include_tasks: depenencies.yml
 
-- name: "Define user variable for non-ssh use"
-  set_fact:
-    fubarhouse_user: "{{ ansible_user_id }}"
-  when: ansible_ssh_user is not defined and fubarhouse_user is not defined
+- name: "Import uninstall tasks"
+  include_tasks: uninstall.yml
+  when: pm2_clean_install
 
-- name: "Get $HOME"
-  shell: "echo $HOME"
-  register: shell_home_dir
-  changed_when: false
-  when: fubarhouse_user_dir is not defined
-
-- name: "Set $HOME"
-  set_fact:
-    fubarhouse_user_dir: "{{ shell_home_dir.stdout }}"
-  when: fubarhouse_user_dir is not defined
-
-- name: "Install dependencies"
-  package:
-    name: "{{ item }}"
-    state: installed
-  with_items:
-    - npm
-
-- name: "Importing PM2 Tasks"
-  include: pm2.yml
+- name: "Import install Tasks"
+  include_tasks: install.yml
 
 - name: "Importing NodeJS Application Tasks"
-  include: apps.yml
+  include_tasks: applications.yml
+  when: node_apps.0 is defined

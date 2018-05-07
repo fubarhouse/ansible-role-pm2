@@ -1,15 +1,11 @@
 ---
 
-# file: roles/fubarhouse.pm2/tasks/pm2.yml
+# file: roles/fubarhouse.pm2/tasks/install.yml
 
 - name: "PM2 | Locate NPM"
   shell: which npm | cat
   register: which_npm
   changed_when: false
-
-- name: "Include cleanup tasks"
-  include: cleanup.yml
-  when: pm2_clean_install
 
 - name: "PM2 | Locate PM2"
   shell: which pm2 | cat
