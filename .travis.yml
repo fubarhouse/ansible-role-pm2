@@ -112,6 +112,9 @@ before_install:
 
 script:
 
+  # Removes Node Version Manager, because we want to install it ourselves later.
+  - rm -rf /root/.nvm
+
   - container_id=$(mktemp)
 
   # Run container in detached state.
