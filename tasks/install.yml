@@ -15,7 +15,6 @@
 - name: "PM2 | Locate PM2"
   stat:
     path: "{{ npm_global_path }}/pm2/bin/pm2"
-  shell: which pm2 | cat
   register: prestat_pm2
   changed_when: false
 
