@@ -7,10 +7,17 @@
   register: which_npm
   changed_when: false
 
-#- name: "PM2 | Locate PM2"
-#  shell: which pm2 | cat
-#  register: which_pm2
-#  changed_when: false
+- name: "PM2 | Locate global root path"
+  shell: "{{ which_npm.stdout }} root -g"
+  register: npm_global_path
+  changed_when: false
+
+- name: "PM2 | Locate PM2"
+  stat:
+    path: "{{ npm_global_path }}/pm2/bin/pm2"
+  shell: which pm2 | cat
+  register: prestat_pm2
+  changed_when: false
 
 - name: "PM2 | Install"
   npm:
@@ -18,11 +25,11 @@
     executable: "{{ which_npm.stdout }}"
     state: present
     global: yes
-#  when: '"pm2" not in which_pm2.stdout'
+  when: prestat_pm2.stat.exists|bool == false
 
-#- name: "PM2 | Verify installation"
-#  stat:
-#    path: /etc/file.txt
-#  register: pm2_verify
-#  changed_when: false
-#  failed_when: '"pm2" not in pm2_verify.stdout'
+- name: "PM2 | Verify installation"
+  stat:
+    path: "{{ npm_global_path }}/pm2/bin/pm2"
+  register: poststat_pm2
+  changed_when: false
+  failed_when: poststat_pm2.stat.exists|bool == true
