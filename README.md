@@ -1,8 +1,10 @@
 # Ansible Role: PM2
 
-[![Build Status](https://travis-ci.org/fubarhouse/ansible-role-pm2.svg?branch=master)](https://travis-ci.org/fubarhouse/ansible-role-pm2)
-[![Ansible Galaxy](https://img.shields.io/ansible/role/9715.svg)](https://galaxy.ansible.com/fubarhouse/pm2)
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/fubarhouse/ansible-role-pm2/master/LICENSE)
+[![Build Status](https://travis-ci.org/fubarhouse/ansible-role-pm2.svg?branch=master?style=for-the-badge)](https://travis-ci.org/fubarhouse/ansible-role-pm2)
+[![Stability](https://img.shields.io/ansible/role/9715.svg?style=for-the-badge)](https://github.com/orangemug/stability-badges)
+[![Releases](https://img.shields.io/github/tag/fubarhouse/ansible-role-pm2.svg?style=for-the-badge)](https://github.com/fubarhouse/ansible-role-pm2/releases)
+[![Ansible Galaxy](https://img.shields.io/ansible/role/9715.svg?style=for-the-badge)](https://galaxy.ansible.com/fubarhouse/pm2)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](https://raw.githubusercontent.com/fubarhouse/ansible-role-pm2/master/LICENSE)
 
 * Install PM2 to any desired location - A node application manager
 * Clone/Pull node applications from remote repositories
