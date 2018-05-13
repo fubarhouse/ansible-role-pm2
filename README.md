@@ -18,7 +18,7 @@
 
 ## Requirements
 
-  As the URI module is in use here, Ansible v2.0.2 is required, however it will continue to work until ignore_errors is unset from that task.
+None.
 
 ## Role Variables
 
