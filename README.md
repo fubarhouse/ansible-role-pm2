@@ -1,7 +1,7 @@
 # Ansible Role: PM2
 
-[![Build Status](https://travis-ci.org/fubarhouse/ansible-role-pm2.svg?branch=master?style=for-the-badge)](https://travis-ci.org/fubarhouse/ansible-role-pm2)
-[![Stability](https://img.shields.io/ansible/role/9715.svg?style=for-the-badge)](https://github.com/orangemug/stability-badges)
+[![Build Status](https://img.shields.io/travis/fubarhouse/ansible-role-pm2/master.svg?style=for-the-badge)](https://travis-ci.org/fubarhouse/ansible-role-pm2)
+[![Stability](https://img.shields.io/badge/stability-stable-green.svg?style=for-the-badge)](https://github.com/orangemug/stability-badges)
 [![Releases](https://img.shields.io/github/tag/fubarhouse/ansible-role-pm2.svg?style=for-the-badge)](https://github.com/fubarhouse/ansible-role-pm2/releases)
 [![Ansible Galaxy](https://img.shields.io/ansible/role/9715.svg?style=for-the-badge)](https://galaxy.ansible.com/fubarhouse/pm2)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)](https://raw.githubusercontent.com/fubarhouse/ansible-role-pm2/master/LICENSE)
