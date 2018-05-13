@@ -20,10 +20,10 @@ env:
     init: /sbin/init
     run_opts: --privileged
     playbook: playbook.yml
-  - distro: saucy
-    init: /sbin/init
-    run_opts: --privileged
-    playbook: playbook.yml
+#  - distro: saucy
+#    init: /sbin/init
+#    run_opts: --privileged
+#    playbook: playbook.yml
   - distro: trusty
     init: /sbin/init
     run_opts: --privileged
