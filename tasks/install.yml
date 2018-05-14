@@ -1,0 +1,34 @@
+---
+
+# file: roles/fubarhouse.pm2/tasks/install.yml
+
+- name: "PM2 | Locate NPM"
+  shell: which npm | cat
+  register: which_npm
+  changed_when: false
+
+- name: "PM2 | Locate global root path"
+  shell: "{{ which_npm.stdout }} root -g"
+  register: npm_global_path
+  changed_when: false
+
+- name: "PM2 | Locate PM2"
+  stat:
+    path: "{{ npm_global_path }}/pm2/bin/pm2"
+  register: prestat_pm2
+  changed_when: false
+
+- name: "PM2 | Install"
+  npm:
+    name: "pm2"
+    executable: "{{ which_npm.stdout }}"
+    state: present
+    global: yes
+  when: prestat_pm2.stat.exists|bool == false
+
+- name: "PM2 | Verify installation"
+  stat:
+    path: "{{ npm_global_path }}/pm2/bin/pm2"
+  register: poststat_pm2
+  changed_when: false
+  failed_when: poststat_pm2.stat.exists|bool == true

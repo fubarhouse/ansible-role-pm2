@@ -3,11 +3,8 @@
 - name: "PM2 | Checking folders"
   file:
     state: directory
-    path: "{{ item.location }}"
-    owner: "{{ fubarhouse_user }}"
     recurse: yes
   with_items: "{{ node_apps }}"
-  when: node_apps.0 is defined
 
 - name: "PM2 | Ensure repositories are up to date"
   git:
@@ -19,23 +16,19 @@
     accept_hostkey: yes
     version: master
   with_items: "{{ node_apps }}"
-  when: node_apps.0 is defined
 
 - name: "PM2 | Ensure application(s) are installed"
   shell: "{{ which_npm.stdout }} install --prefix {{ item.location }}"
   with_items: "{{ node_apps }}"
-  when:
-    - '"npm" in which_npm.stdout'
-    - node_apps.0 is defined
+  when: '"npm" in which_npm.stdout'
 
 - name: PM2 | Copying configuration file when asked
   copy:
     remote_src: yes
     src: "{{ item.location }}/{{ item.config.origin }}"
     dest: "{{ item.location }}/{{ item.config.destination }}"
-    owner: "{{ fubarhouse_user }}"
   with_items: "{{ node_apps }}"
-  when: item.config is defined and node_apps.0 is defined
+  when: item.config is defined
 
 - name: PM2 | Create databases when requested
   mysql_db:
@@ -44,7 +37,7 @@
     encoding: "utf8"
     state: present
   with_items: "{{ node_apps }}"
-  when: item.database.name is defined and node_apps.0 is defined
+  when: item.database.name is defined
 
 - name: PM2 | Import database if provided
   mysql_db:
@@ -52,7 +45,7 @@
     name: "{{ item.database.name }}"
     target: "{{ item.location }}/{{ item.database.file }}"
   with_items: "{{ node_apps }}"
-  when: item.database.file is defined and node_apps.0 is defined
+  when: item.database.file is defined
 
 - name: "PM2 | Kill daemon"
   shell: 'pm2 kill'
@@ -68,7 +61,6 @@
 - name: "PM2 | Ensure started"
   shell: "pm2 start {{ item.location }}/{{ item.start }} --name '{{ item.name }}' | cat"
   with_items: "{{ node_apps }}"
-  when: node_apps.0 is defined
 
 - name: "PM2 | Ensure application is registered"
   shell: "pm2 show '{{ item.name }}' | cat"
@@ -81,7 +73,6 @@
     port: "{{ item.port }}"
     delay: 5
   with_items: "{{ node_apps }}"
-  when: node_apps.0 is defined
 
 - name: PM2 | Get status"
   uri:
@@ -91,14 +82,11 @@
   retries: 5
   delay: 5
   ignore_errors: yes
-  when: node_apps.0 is defined
 
 - name: "PM2 | Reloading applications"
   shell: "pm2 reload '{{ item.name }}'"
   with_items: "{{ node_apps }}"
   ignore_errors: yes
-  when: node_apps.0 is defined
 
 - name: "PM2 | Flush logs"
   shell: "pm2 flush | cat"
-  when: node_apps.0 is defined

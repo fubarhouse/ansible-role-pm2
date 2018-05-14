@@ -3,6 +3,8 @@
 - hosts: localhost
   vars:
     node_apps: []
+    nvm_install_dir: /root/nvm_install_test
+
   pre_tasks:
     - name: Update yum cache.
       yum:
@@ -21,4 +23,5 @@
       failed_when: false
 
   roles:
+    - fubarhouse.nodejs
     - role_under_test

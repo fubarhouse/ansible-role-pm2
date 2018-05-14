@@ -1,0 +1,14 @@
+---
+
+- name: "Look for dependencies"
+  shell: which npm
+  register: is_npm_installed
+  changed_when: false
+
+- name: "Install dependencies"
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - npm
+  when: '"npm" not in is_npm_installed.stdout'

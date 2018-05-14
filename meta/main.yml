@@ -5,13 +5,14 @@ galaxy_info:
   author: fubarhouse
   description: Provisions Node applications via PM2
   license: "license (BSD, MIT)"
-  min_ansible_version: 2.0.2
+  min_ansible_version: 2.4
   platforms:
     - name: Debian
       versions:
         - wheezy
         - jessie
         - stretch
+        - buster
     - name: EL
       versions:
         - 6
@@ -21,8 +22,11 @@ galaxy_info:
         - 24
         - 25
         - 26
+        - 27
+        - 28
     - name: Ubuntu
       versions:
+        - bionic
         - artful
         - zesty
         - yakkety
@@ -31,10 +35,10 @@ galaxy_info:
         - wily
         - utopic
         - trusty
-        - saucy
-#        - raring
-#        - quantal
-#        - precise
+#        - saucy
+        - raring
+        - quantal
+        - precise
   categories:
     - system
     - development
